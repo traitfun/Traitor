@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BANKRMINT — Create 1000 NFTs in 1 minute</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f0f8;
+  --bg2: #e8e8f4;
+  --white: #ffffff;
+  --purple: #4040c0;
+  --purple2: #5252d4;
+  --purple-light: #e8e8f8;
+  --cyan: #00bcd4;
+  --text: #111118;
+  --text2: #555568;
+  --text3: #999ab0;
+  --border: #e0e0ee;
+  --red: #ff3b3b;
+  --card-shadow: 0 2px 16px rgba(60,60,120,0.10);
+  --green: #22c55e;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; }
+
+body {
+  background: var(--bg);
+  font-family: 'Outfit', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== NAV ===== */
+nav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: var(--purple);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.logo-text {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--purple);
+  letter-spacing: -0.5px;
+}
+.logo-version {
+  font-size: 10px;
+  color: var(--text3);
+  font-weight: 500;
+  margin-top: -10px;
+  margin-left: 2px;
+}
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+
+.btn-create {
+  background: var(--purple);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 10px 22px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-create:hover { background: var(--purple2); transform: scale(1.03); }
+
+.btn-wallet {
+  background: var(--cyan);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+.btn-wallet:hover { opacity: 0.88; transform: scale(1.03); }
+.btn-wallet.connected {
+  background: var(--green);
+  font-size: 12px;
+  padding: 8px 14px;
+}
+
+/* ===== TICKER ===== */
+.ticker {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+  overflow: hidden;
+  position: relative;
+}
+.ticker-track {
+  display: flex;
+  gap: 0;
+  animation: tickerScroll 25s linear infinite;
+  width: max-content;
+}
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px;
+  white-space: nowrap;
+  border-right: 1px solid var(--border);
+}
+.ticker-avatar {
+  width: 32px; height: 32px;
+  border-radius: 10px;
+  background: var(--purple-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  overflow: hidden;
+}
+.ticker-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+.ticker-info {}
+.ticker-name { font-weight: 700; font-size: 13px; }
+.ticker-action { font-size: 11px; color: var(--red); font-weight: 600; }
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ===== PAGE VIEWS ===== */
+#homePage, #createPage, #browsePage, #detailPage, #marketPage { display: none; }
+#homePage.active, #createPage.active, #browsePage.active, #detailPage.active, #marketPage.active { display: block; }
+
+/* ===== HOME HERO ===== */
+.hero {
+  padding: 40px 20px 32px;
+  text-align: center;
+}
+.hero-logo-big {
+  width: 100px; height: 100px;
+  background: var(--white);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: var(--card-shadow);
+  font-size: 52px;
+}
+.hero-sub { font-size: 14px; color: var(--text3); font-weight: 600; letter-spacing: 1px; margin-bottom: 6px; }
+.hero-title { font-size: 30px; font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+.btn-browse {
+  background: var(--purple);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 36px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+}
+.btn-browse:hover { background: var(--purple2); transform: translateY(-2px); }
+
+/* Feature cards */
+.feature-cards {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.feature-cards::-webkit-scrollbar { display: none; }
+.feature-card {
+  background: var(--white);
+  border-radius: 18px;
+  padding: 20px;
+  min-width: 270px;
+  box-shadow: var(--card-shadow);
+  flex-shrink: 0;
+}
+.feature-card p { color: var(--text3); font-size: 14px; margin-bottom: 14px; line-height: 1.5; }
+.feature-chars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 22px;
+}
+.feature-arrow { font-size: 18px; color: var(--text3); }
+
+/* ===== TABS ===== */
+.tabs-bar {
+  background: var(--white);
+  padding: 0 16px;
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 61px;
+  z-index: 99;
+}
+.tab-btn {
+  padding: 14px 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text3);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s;
+}
+.tab-btn.active { color: var(--text); border-bottom-color: var(--purple); }
+
+/* Search bar */
+.search-wrap {
+  padding: 14px 16px 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.search-input {
+  flex: 1;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 99px;
+  padding: 11px 16px 11px 40px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--purple); }
+.search-wrap-inner {
+  flex: 1;
+  position: relative;
+}
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 16px;
+}
+.filter-btn {
+  width: 44px; height: 44px;
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Collection grid */
+.collections-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 4px 16px 80px;
+}
+.coll-card {
+  background: var(--white);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.coll-card:active { transform: scale(0.97); }
+
+.coll-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--purple-light);
+  position: relative;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 52px;
+}
+.coll-cover img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.coll-cover-placeholder {
+  width: 100%; height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.coll-cover-cell {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+}
+.coll-body { padding: 10px 12px 12px; }
+.coll-name { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+.coll-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.coll-creator {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--text3); font-weight: 600;
+}
+.creator-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; color: white; font-weight: 800;
+}
+.coll-price {
+  font-size: 13px; font-weight: 800; color: var(--text);
+}
+.coll-symbol {
+  font-size: 10px; color: var(--text3); font-weight: 600;
+  margin-top: 1px;
+}
+
+/* ===== CREATE PAGE ===== */
+.create-wrap {
+  padding: 20px 16px 80px;
+}
+.create-card {
+  background: var(--white);
+  border-radius: 22px;
+  padding: 24px 20px;
+  box-shadow: var(--card-shadow);
+}
+.create-title {
+  font-size: 20px; font-weight: 800;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Tab toggle */
+.create-tabs {
+  display: flex;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 3px;
+  margin-bottom: 20px;
+}
+.create-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text3);
+  transition: all 0.2s;
+}
+.create-tab.active {
+  background: var(--white);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(60,60,120,0.12);
+}
+
+/* Upload zone */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 20px;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.upload-zone:hover { border-color: var(--purple); background: var(--purple-light); }
+.upload-zone.has-file { border-color: var(--purple); border-style: solid; background: var(--purple-light); }
+.upload-icon-big { font-size: 40px; }
+.upload-text { font-size: 14px; font-weight: 600; color: var(--text2); }
+.upload-sub { font-size: 12px; color: var(--text3); }
+.upload-preview { width: 120px; height: 120px; border-radius: 16px; object-fit: cover; }
+
+/* Prompt input */
+.prompt-box {
+  border: 2px solid var(--purple-light);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  transition: border-color 0.2s;
+  position: relative;
+}
+.prompt-box:focus-within { border-color: var(--purple); }
+.prompt-box textarea {
+  width: 100%; border: none; outline: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px; color: var(--text);
+  resize: none; background: transparent;
+  min-height: 80px; line-height: 1.5;
+}
+.prompt-box textarea::placeholder { color: var(--text3); }
+.prompt-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 8px;
+}
+.prompt-hint { font-size: 12px; color: var(--text3); font-style: italic; }
+.magic-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 20px; transition: transform 0.2s;
+}
+.magic-btn:hover { transform: rotate(20deg) scale(1.2); }
+
+/* Style section */
+.style-label { font-size: 14px; font-weight: 700; color: var(--text2); margin-bottom: 12px; }
+.style-grid {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  margin-bottom: 24px;
+}
+.style-grid::-webkit-scrollbar { display: none; }
+.style-chip {
+  flex-shrink: 0;
+  width: 90px;
+  border-radius: 14px;
+  border: 2.5px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--white);
+}
+.style-chip.active { border-color: var(--purple); }
+.style-chip:hover { border-color: var(--purple2); }
+.style-img {
+  width: 100%; aspect-ratio: 1;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  position: relative;
+  overflow: hidden;
+}
+.style-img img { width: 100%; height: 100%; object-fit: cover; }
+.style-none-icon {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3);
+  font-size: 14px;
+}
+.style-name {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 4px;
+  color: var(--text2);
+}
+.style-chip.active .style-name { color: var(--purple); }
+
+/* Cost + Make it */
+.cost-row {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.cost-label { font-size: 13px; color: var(--text3); font-weight: 600; }
+.cost-val { font-size: 16px; font-weight: 800; color: var(--purple); }
+
+.make-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--purple);
+  color: var(--white);
+  border: none;
+  border-radius: 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+.make-btn:hover:not(:disabled) { background: var(--purple2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(64,64,192,0.3); }
+.make-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ===== GENERATING OVERLAY ===== */
+.gen-overlay {
+  position: fixed; inset: 0;
+  background: rgba(240,240,248,0.95);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px;
+}
+.gen-overlay.show { display: flex; }
+.gen-spinner {
+  width: 80px; height: 80px;
+  border-radius: 20px;
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  margin-bottom: 24px;
+  box-shadow: var(--card-shadow);
+  animation: genPulse 1s ease-in-out infinite;
+}
+@keyframes genPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+.gen-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+.gen-sub { font-size: 14px; color: var(--text3); margin-bottom: 28px; }
+.gen-bar-bg {
+  width: 100%; max-width: 300px;
+  height: 8px; background: var(--border);
+  border-radius: 99px; overflow: hidden;
+  margin-bottom: 10px;
+}
+.gen-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), var(--cyan));
+  border-radius: 99px;
+  width: 0%;
+  transition: width 0.3s;
+}
+.gen-count { font-size: 13px; color: var(--text3); font-weight: 600; }
+.gen-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+  max-width: 260px;
+  margin-top: 24px;
+}
+.gen-preview-cell {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: var(--card-shadow);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.gen-preview-cell.shown { opacity: 1; }
+
+/* ===== DETAIL PAGE ===== */
+.detail-wrap { padding: 16px 16px 80px; }
+.back-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.back-btn {
+  width: 38px; height: 38px;
+  background: var(--white);
+  border: none; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer;
+  box-shadow: var(--card-shadow);
+}
+.detail-title { font-size: 20px; font-weight: 800; }
+
+.detail-hero {
+  background: var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 14px;
+}
+.detail-hero-img {
+  width: 100%; aspect-ratio: 1;
+  background: var(--purple-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 80px;
+  position: relative;
+}
+.detail-hero-img img { width: 100%; height: 100%; object-fit: cover; }
+.detail-hero-body { padding: 16px; }
+.detail-collection-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.detail-creator-row {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--text3); font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 1px;
+  background: var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.stat-box {
+  background: var(--white);
+  padding: 14px 8px;
+  text-align: center;
+}
+.stat-val { font-size: 18px; font-weight: 800; }
+.stat-key { font-size: 10px; color: var(--text3); font-weight: 600; margin-top: 2px; }
+
+/* Mint card */
+.mint-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 14px;
+}
+.mint-price-section { margin-bottom: 14px; }
+.mint-price-label { font-size: 12px; color: var(--text3); font-weight: 600; margin-bottom: 4px; }
+.mint-price-big { font-size: 32px; font-weight: 900; }
+.mint-price-token { font-size: 15px; color: var(--text3); font-weight: 600; margin-left: 4px; }
+.mint-next { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.mint-next span { color: var(--red); font-weight: 700; }
+
+/* Progress */
+.mint-prog-label {
+  display: flex; justify-content: space-between;
+  font-size: 12px; color: var(--text3); font-weight: 600;
+  margin-bottom: 6px;
+}
+.mint-prog-bg { height: 7px; background: var(--bg); border-radius: 99px; overflow: hidden; margin-bottom: 16px; }
+.mint-prog-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--cyan)); border-radius: 99px; transition: width 0.5s; }
+
+.approve-btn2 {
+  width: 100%; padding: 13px;
+  background: transparent;
+  border: 2px solid var(--purple);
+  border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px; font-weight: 800;
+  color: var(--purple);
+  cursor: pointer; margin-bottom: 10px;
+  transition: all 0.2s;
+}
+.approve-btn2:hover { background: var(--purple-light); }
+.approve-btn2:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.mint-btn2 {
+  width: 100%; padding: 15px;
+  background: var(--purple);
+  border: none; border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px; font-weight: 800;
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.mint-btn2:hover:not(:disabled) { background: var(--purple2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(64,64,192,0.3); }
+.mint-btn2:disabled { opacity: 0.35; cursor: not-allowed; }
+.mint-btn2 .btn-shine {
+  position: absolute; top:0; left:-100%; width:50%; height:100%;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+  animation: btnShine 3s ease-in-out infinite;
+}
+@keyframes btnShine { 0%{left:-100%} 50%,100%{left:150%} }
+
+/* NFT grid */
+.nft-section { margin-top: 14px; }
+.nft-section-title { font-size: 15px; font-weight: 800; margin-bottom: 12px; }
+.nft-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+}
+.nft-thumb {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  background: var(--purple-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.nft-thumb:hover { transform: scale(1.05); }
+.nft-thumb.minted::after {
+  content: '';
+  position: absolute; inset:0;
+  background: rgba(0,0,0,0.35);
+  border-radius: 12px;
+}
+.nft-thumb .nft-num {
+  position: absolute; bottom:4px; right:5px;
+  font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  z-index: 1;
+}
+
+/* ===== SUCCESS MODAL ===== */
+.modal-bg {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  z-index: 300;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-bg.show { display: flex; }
+.modal-sheet {
+  background: var(--white);
+  border-radius: 24px 24px 0 0;
+  padding: 28px 24px 36px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle { width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 20px; }
+.modal-emoji { font-size: 52px; margin-bottom: 12px; }
+.modal-title { font-size: 24px; font-weight: 900; margin-bottom: 6px; }
+.modal-desc { font-size: 14px; color: var(--text3); line-height: 1.6; margin-bottom: 20px; }
+.modal-tag {
+  display: inline-block;
+  padding: 8px 20px;
+  background: var(--purple-light);
+  border-radius: 10px;
+  font-size: 14px; font-weight: 800; color: var(--purple);
+  margin-bottom: 20px;
+}
+.modal-close-btn {
+  width: 100%; padding: 14px;
+  background: var(--purple);
+  border: none; border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px; font-weight: 800; color: #fff;
+  cursor: pointer;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: var(--white);
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 13px; font-weight: 700;
+  opacity: 0; transition: all 0.3s;
+  z-index: 400; white-space: nowrap;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 12px;
+  display: flex;
+  z-index: 100;
+}
+.bnav-item {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: none; border: none; cursor: pointer;
+  padding: 4px 0;
+  transition: all 0.15s;
+}
+.bnav-icon { font-size: 22px; }
+.bnav-label { font-size: 10px; font-weight: 700; color: var(--text3); }
+.bnav-item.active .bnav-label { color: var(--purple); }
+.bnav-item.active .bnav-icon { filter: none; }
+
+/* ===== TX STATUS ===== */
+.tx-row {
+  display: none;
+  align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: var(--purple-light);
+  border-radius: 10px;
+  font-size: 12px; font-weight: 700; color: var(--purple);
+  margin-bottom: 10px;
+}
+.tx-row.show { display: flex; }
+.spin {
+  width:16px;height:16px;
+  border:2.5px solid rgba(64,64,192,0.2);
+  border-top-color:var(--purple);
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+  flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== SELL BUTTON ===== */
+.sell-btn {
+  width: 100%; padding: 13px;
+  background: var(--red);
+  border: none; border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px; font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.18s;
+  position: relative; overflow: hidden;
+}
+.sell-btn:hover:not(:disabled) { background: #e02020; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,59,59,0.35); }
+.sell-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+@keyframes sellFlash {
+  0% { background: #ff3b3b; }
+  30% { background: #ff8800; }
+  60% { background: #ff3b3b; }
+  100% { background: #ff3b3b; }
+}
+.sell-btn.flashing { animation: sellFlash 0.5s ease; }
+
+.exit-labels {
+  display: flex; gap: 8px; margin-top: 10px;
+}
+.exit-label {
+  flex: 1;
+  padding: 7px 8px;
+  border-radius: 9px;
+  font-size: 11px; font-weight: 700;
+  text-align: center;
+  line-height: 1.4;
+}
+.exit-label.high-tax {
+  background: rgba(255,59,59,0.1);
+  color: var(--red);
+}
+.exit-label.low-tax {
+  background: rgba(34,197,94,0.1);
+  color: var(--green);
+}
+
+/* ===== SECONDARY MARKET ===== */
+.market-section {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: var(--card-shadow);
+  margin-top: 14px;
+}
+.market-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.market-title {
+  font-size: 16px; font-weight: 800;
+}
+.market-badge {
+  font-size: 10px; font-weight: 800;
+  padding: 4px 10px;
+  background: var(--green);
+  color: #fff;
+  border-radius: 99px;
+  letter-spacing: 0.5px;
+}
+.market-empty {
+  text-align: center;
+  padding: 20px 0;
+  color: var(--text3);
+  font-size: 13px; font-weight: 600;
+}
+.list-btn {
+  width: 100%; padding: 13px;
+  background: var(--green);
+  border: none; border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px; font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.18s;
+}
+.list-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.listing-card {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.listing-left {}
+.listing-price { font-size: 18px; font-weight: 900; }
+.listing-price-token { font-size: 12px; color: var(--text3); font-weight: 600; margin-left: 3px; }
+.listing-seller { font-size: 11px; color: var(--text3); font-weight: 600; margin-top: 2px; }
+.buy-from-market-btn {
+  padding: 9px 18px;
+  background: var(--purple);
+  border: none; border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px; font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.buy-from-market-btn:hover { background: var(--purple2); transform: scale(1.04); }
+.market-fee-note {
+  font-size: 11px; color: var(--text3); font-weight: 600;
+  text-align: center; margin-top: 8px;
+}
+.sold-out-banner {
+  background: linear-gradient(90deg, var(--green), #16a34a);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px; font-weight: 800;
+  text-align: center;
+  margin-bottom: 14px;
+  letter-spacing: 0.3px;
+}
+
+/* ===== MARKETPLACE PAGE ===== */
+.market-page-wrap {
+  padding: 16px 16px 90px;
+}
+.market-page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.market-page-title {
+  font-size: 22px; font-weight: 900;
+}
+.market-page-count {
+  font-size: 12px; font-weight: 700;
+  color: var(--text3);
+  background: var(--bg2);
+  padding: 4px 10px;
+  border-radius: 99px;
+}
+.market-filter-row {
+  display: flex; gap: 8px;
+  overflow-x: auto; scrollbar-width: none;
+  padding-bottom: 4px;
+  margin-bottom: 14px;
+}
+.market-filter-row::-webkit-scrollbar { display: none; }
+.market-filter-chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px; font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.market-filter-chip.active,
+.market-filter-chip:hover {
+  background: var(--purple);
+  color: #fff;
+  border-color: var(--purple);
+}
+.market-sort-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.market-sort-label { font-size: 12px; color: var(--text3); font-weight: 600; }
+.market-sort-select {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px; font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+}
+.market-nft-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.market-nft-card {
+  background: var(--white);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s;
+  border: 1.5px solid transparent;
+  position: relative;
+}
+.market-nft-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 32px rgba(60,60,120,0.18);
+  border-color: var(--purple);
+}
+.market-nft-card:active { transform: scale(0.97); }
+.market-nft-img {
+  width: 100%; aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 52px;
+  position: relative;
+  overflow: hidden;
+}
+.market-nft-id-badge {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 10px; font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 99px;
+  backdrop-filter: blur(4px);
+}
+.market-nft-body {
+  padding: 10px 12px 14px;
+}
+.market-nft-coll {
+  font-size: 10px; font-weight: 700;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.market-nft-name {
+  font-size: 13px; font-weight: 800;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.market-nft-price-row {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 6px;
+}
+.market-nft-price-block {}
+.market-nft-buy-label {
+  font-size: 9px; font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 1px;
+}
+.market-nft-price {
+  font-size: 17px; font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+}
+.market-nft-price-token {
+  font-size: 11px; font-weight: 700;
+  color: var(--text3);
+  margin-left: 2px;
+}
+.market-nft-buy-btn {
+  padding: 7px 14px;
+  background: var(--purple);
+  border: none; border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px; font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.market-nft-buy-btn:hover { background: var(--purple2); transform: scale(1.07); }
+.market-nft-seller {
+  font-size: 10px; color: var(--text3); font-weight: 600;
+  margin-top: 6px;
+}
+.market-empty-state {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 60px 20px;
+}
+.market-empty-icon { font-size: 52px; margin-bottom: 14px; }
+.market-empty-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.market-empty-sub { font-size: 13px; color: var(--text3); line-height: 1.6; }
+.market-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.market-stat-pill {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 12px 8px;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+}
+.market-stat-val { font-size: 16px; font-weight: 900; color: var(--purple); }
+.market-stat-key { font-size: 10px; color: var(--text3); font-weight: 600; margin-top: 2px; }
+.view-on-market-btn {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(90deg, var(--purple), var(--cyan));
+  border: none; border-radius: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px; font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+.view-on-market-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(64,64,192,0.3); }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-emoji" id="modalEmoji">🎉</div>
+    <div class="modal-title" id="modalTitle">Minted!</div>
+    <div class="modal-desc" id="modalDesc">You just minted an NFT. Price goes up for the next buyer!</div>
+    <div class="modal-tag" id="modalTag">NFT #1 · 1 $BANKR</div>
+    <button class="modal-close-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<!-- GENERATING OVERLAY -->
+<div class="gen-overlay" id="genOverlay">
+  <div class="gen-spinner">🎨</div>
+  <div class="gen-title">Creating your NFTs</div>
+  <div class="gen-sub">AI is generating 1,000 unique images…</div>
+  <div class="gen-bar-bg"><div class="gen-bar-fill" id="genBar"></div></div>
+  <div class="gen-count" id="genCount">0 / 1000</div>
+  <div class="gen-preview-grid" id="genPreview">
+    <div class="gen-preview-cell" id="gc0">🦊</div>
+    <div class="gen-preview-cell" id="gc1">🐺</div>
+    <div class="gen-preview-cell" id="gc2">🐱</div>
+    <div class="gen-preview-cell" id="gc3">🦁</div>
+    <div class="gen-preview-cell" id="gc4">🐸</div>
+    <div class="gen-preview-cell" id="gc5">🐉</div>
+    <div class="gen-preview-cell" id="gc6">🦄</div>
+    <div class="gen-preview-cell" id="gc7">🐼</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-icon">🦊</div>
+    <div>
+      <div class="logo-text">BANKRMINT</div>
+    </div>
+    <div class="logo-version">v1.0</div>
+  </div>
+  <div class="nav-right">
+    <button class="btn-create" onclick="goCreate()">Create</button>
+    <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">+ +</button>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- HOME PAGE -->
+<div id="homePage" class="active">
+  <div class="hero">
+    <div class="hero-logo-big">🦊</div>
+    <div class="hero-sub">Betrayal Markets</div>
+    <div class="hero-title">Everyone has a price.</div>
+    <button class="btn-browse" onclick="goBrowse()">Browse Drops</button>
+  </div>
+
+  <div class="feature-cards">
+    <div class="feature-card">
+      <p>Create a betrayal market from any image in seconds.</p>
+      <div class="feature-chars">
+        <span>🦊</span>
+        <span class="feature-arrow">→</span>
+        <span>🎩🦊</span><span>🌊🦊</span><span>🔥🦊</span><span>⚡🦊</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <p>The price increases with every mint. Early buyers pay less.</p>
+      <div class="feature-chars">
+        <span style="font-size:14px;font-weight:800">1 $BANKR</span>
+        <span class="feature-arrow">→</span>
+        <span style="font-size:14px;font-weight:800;color:var(--purple)">1000 $BANKR</span>
+      </div>
+    </div>
+    <div class="feature-card">
+      <p>Creator earns royalties from every mint. Set your own %.</p>
+      <div class="feature-chars">
+        <span style="font-size:14px;font-weight:800">💰 Royalties</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Browse tabs inline -->
+  <div class="tabs-bar" style="top:auto;position:relative;margin-top:8px;">
+    <button class="tab-btn active" id="tab-hot" onclick="setTab('hot')">Hot</button>
+    <button class="tab-btn" id="tab-new" onclick="setTab('new')">New</button>
+    <button class="tab-btn" id="tab-top" onclick="setTab('top')">Top</button>
+    <button class="tab-btn" id="tab-feed" onclick="setTab('feed')">Feed</button>
+    <button class="tab-btn" id="tab-rank" onclick="setTab('rank')">Rank</button>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-wrap-inner">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" placeholder="Search" oninput="filterCollections(this.value)">
+    </div>
+    <div class="filter-btn">⊞</div>
+  </div>
+
+  <div class="collections-grid" id="homeGrid"></div>
+</div>
+
+<!-- BROWSE PAGE (same layout) -->
+<div id="browsePage">
+  <div class="tabs-bar">
+    <button class="tab-btn active">Hot</button>
+    <button class="tab-btn">New</button>
+    <button class="tab-btn">Top</button>
+    <button class="tab-btn">Feed</button>
+    <button class="tab-btn">Rank</button>
+  </div>
+  <div class="search-wrap">
+    <div class="search-wrap-inner">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" placeholder="Search">
+    </div>
+    <div class="filter-btn">⊞</div>
+  </div>
+  <div class="collections-grid" id="browseGrid"></div>
+</div>
+
+<!-- CREATE PAGE -->
+<div id="createPage">
+  <div class="create-wrap">
+    <div class="create-card">
+      <div class="create-title">Create 1000 NFTs in 1 minute</div>
+
+      <div class="create-tabs">
+        <button class="create-tab" id="ctab-create" onclick="switchCreateTab('create')">Create</button>
+        <button class="create-tab active" id="ctab-image" onclick="switchCreateTab('image')">Add Image</button>
+      </div>
+
+      <!-- Add Image tab -->
+      <div id="createImagePanel">
+        <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('imageInput').click()">
+          <div class="upload-icon-big">🖼️</div>
+          <div class="upload-text">Tap to upload an image</div>
+          <div class="upload-sub">PNG, JPG, GIF · Your character</div>
+        </div>
+      </div>
+
+      <!-- Create (prompt) tab -->
+      <div id="createPromptPanel" style="display:none">
+        <div class="prompt-box">
+          <textarea id="promptInput" placeholder="Describe your character" rows="3"></textarea>
+          <div class="prompt-footer">
+            <span class="prompt-hint">Say the vibe</span>
+            <button class="magic-btn" onclick="randomPrompt()">✨</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Style picker -->
+      <div class="style-label">Style</div>
+      <div class="style-grid" id="styleGrid">
+        <div class="style-chip active" onclick="selectStyle(this, 'none')">
+          <div class="style-img">
+            <div class="style-none-icon">⊘</div>
+          </div>
+          <div class="style-name">None</div>
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'watercolor')">
+          <div class="style-img" style="background:#fff8f0;font-size:36px">🦊</div>
+          <div class="style-name">Watercolor</div>
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'chibi')">
+          <div class="style-img" style="background:#fff0f8;font-size:36px">🐱</div>
+          <div class="style-name">Chibi</div>
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'pixel')">
+          <div class="style-img" style="background:#f0f8ff;font-size:36px">👾</div>
+          <div class="style-name">Pixel</div>
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, 'anime')">
+          <div class="style-img" style="background:#f8f0ff;font-size:36px">⚔️</div>
+          <div class="style-name">Anime</div>
+        </div>
+        <div class="style-chip" onclick="selectStyle(this, '3d')">
+          <div class="style-img" style="background:#f0fff4;font-size:36px">💎</div>
+          <div class="style-name">3D</div>
+        </div>
+      </div>
+
+      <!-- Name + royalty -->
+      <div style="margin-bottom:14px">
+        <div class="style-label">Collection Name</div>
+        <input id="collNameInput" style="width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;outline:none;transition:border-color 0.2s;" placeholder="My Collection" onfocus="this.style.borderColor='var(--purple)'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+
+      <div class="cost-row">
+        <span class="cost-label">Creation fee</span>
+        <span class="cost-val">60 $BANKR</span>
+      </div>
+
+      <div class="tx-row" id="createTxRow">
+        <div class="spin"></div>
+        <span id="createTxText">Processing…</span>
+      </div>
+
+      <button class="make-btn" id="makeBtn" onclick="makeCollection()">Make it</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL PAGE -->
+<div id="detailPage">
+  <div class="detail-wrap">
+    <div class="back-bar">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="detail-title" id="detailTitle">Collection</div>
+    </div>
+
+    <div class="detail-hero">
+      <div class="detail-hero-img" id="detailHeroImg">🦊</div>
+      <div class="detail-hero-body">
+        <div class="detail-collection-name" id="detailCollName">Collection Name</div>
+        <div class="detail-creator-row">
+          <div class="creator-dot" id="detailCreatorDot">B</div>
+          <span id="detailCreator">0x1234...abcd</span>
+          <span>·</span>
+          <span id="detailSymbol">SYMBOL</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val" id="detailMinted">0</div>
+        <div class="stat-key">MINTED</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">1,000</div>
+        <div class="stat-key">SUPPLY</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="detailRoyalty">5%</div>
+        <div class="stat-key">ROYALTY</div>
+      </div>
+    </div>
+
+    <div class="mint-card">
+      <div class="mint-price-section">
+        <div class="mint-price-label">CURRENT PRICE</div>
+        <div>
+          <span class="mint-price-big" id="detailPrice">1</span>
+          <span class="mint-price-token">$BANKR</span>
+        </div>
+        <div class="mint-next">Next: <span id="detailNextPrice">2 $BANKR</span></div>
+      </div>
+
+      <div class="mint-prog-label">
+        <span id="detailProgLabel">0 / 1000 minted</span>
+        <span id="detailProgPct">0%</span>
+      </div>
+      <div class="mint-prog-bg">
+        <div class="mint-prog-fill" id="detailProgFill" style="width:0%"></div>
+      </div>
+
+      <div class="tx-row" id="mintTxRow">
+        <div class="spin"></div>
+        <span id="mintTxText">Confirm in wallet…</span>
+      </div>
+      <button class="approve-btn2" id="approveBtn2" onclick="approveToken()" disabled>Approve $BANKR</button>
+      <button class="mint-btn2" id="mintBtn2" onclick="doMint()" disabled>
+        <div class="btn-shine"></div>
+        Mint NFT
+      </button>
+      <button class="sell-btn" id="sellBtn" onclick="doSell()" disabled>🔥 Sell (Burn)</button>
+      <div class="exit-labels">
+        <div class="exit-label high-tax">⚡ High tax = instant exit</div>
+        <div class="exit-label low-tax">🌿 Low tax = market sell</div>
+      </div>
+    </div>
+
+    <div class="market-section" id="marketSection" style="display:none">
+      <div class="market-header">
+        <div class="market-title">🏪 Secondary Market</div>
+        <div class="market-badge">OPEN</div>
+      </div>
+      <div class="sold-out-banner">✅ Sold out! Trade on secondary market.</div>
+      <div id="listingsContainer"></div>
+      <button class="list-btn" onclick="listNFT()">+ List My NFT</button>
+      <button class="view-on-market-btn" onclick="switchBnav('market')">🏪 View Global Marketplace</button>
+      <div class="market-fee-note">2% platform fee on all sales</div>
+    </div>
+
+    <div class="nft-section">
+      <div class="nft-section-title">All NFTs</div>
+      <div class="nft-grid" id="detailNftGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MARKET PAGE -->
+<div id="marketPage">
+  <div class="market-page-wrap">
+    <div class="market-page-header">
+      <div class="market-page-title">🏪 Market</div>
+      <div class="market-page-count" id="marketListingCount">0 listings</div>
+    </div>
+
+    <div class="market-stats-bar">
+      <div class="market-stat-pill">
+        <div class="market-stat-val" id="mktStatVol">0</div>
+        <div class="market-stat-key">VOLUME</div>
+      </div>
+      <div class="market-stat-pill">
+        <div class="market-stat-val" id="mktStatFloor">—</div>
+        <div class="market-stat-key">FLOOR</div>
+      </div>
+      <div class="market-stat-pill">
+        <div class="market-stat-val" id="mktStatSales">0</div>
+        <div class="market-stat-key">SALES</div>
+      </div>
+    </div>
+
+    <div class="market-filter-row" id="marketFilterRow">
+      <div class="market-filter-chip active" onclick="filterMarket('all', this)">All</div>
+    </div>
+
+    <div class="market-sort-row">
+      <span class="market-sort-label">Sort by</span>
+      <select class="market-sort-select" onchange="sortMarket(this.value)">
+        <option value="price-asc">Price: Low → High</option>
+        <option value="price-desc">Price: High → Low</option>
+        <option value="recent">Recently Listed</option>
+      </select>
+    </div>
+
+    <div class="market-nft-grid" id="marketNftGrid">
+      <div class="market-empty-state">
+        <div class="market-empty-icon">🏪</div>
+        <div class="market-empty-title">No NFTs listed yet</div>
+        <div class="market-empty-sub">List your NFTs from a collection page<br>to start trading here.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="bnav-item active" id="bnav-home" onclick="switchBnav('home')">
+    <span class="bnav-icon">🏠</span>
+    <span class="bnav-label">Home</span>
+  </button>
+  <button class="bnav-item" id="bnav-browse" onclick="switchBnav('browse')">
+    <span class="bnav-icon">🔥</span>
+    <span class="bnav-label">Browse</span>
+  </button>
+  <button class="bnav-item" id="bnav-market" onclick="switchBnav('market')">
+    <span class="bnav-icon">🏪</span>
+    <span class="bnav-label">Market</span>
+  </button>
+  <button class="bnav-item" id="bnav-create" onclick="switchBnav('create')">
+    <span class="bnav-icon">✨</span>
+    <span class="bnav-label">Create</span>
+  </button>
+  <button class="bnav-item" id="bnav-profile" onclick="switchBnav('profile')">
+    <span class="bnav-icon">👤</span>
+    <span class="bnav-label">Profile</span>
+  </button>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const COLLECTIONS = [
+  { id:1, name:"Traitor Pepe", symbol:"TRAITORPEP", emoji:"🐸", creator:"brian", creatorAddr:"0x1a2b...3c4d", minted:487, price:488, royalty:5, hot:true,
+    colors:["#1a2a1a","#2a1a0a","#0a2a1a","#1a1a2a"],
+    emojis:["🐸","🔱","⚡","🌆","💎","🌊","🔥","🎭"] },
+  { id:2, name:"Traitor Rocks", symbol:"TRAITOROCK", emoji:"🪨", creator:"dCEb7", creatorAddr:"0x9f8e...7d6c", minted:312, price:313, royalty:7, hot:true,
+    colors:["#2a2a2a","#3a3030","#2a3030","#303030"],
+    emojis:["🪨","💎","⛰️","🗿","🌑","🔷","⚫","🌫️"] },
+  { id:3, name:"Left Ear", symbol:"LEFTEAR", emoji:"👂", creator:"0xAb3c", creatorAddr:"0xab12...cd34", minted:89, price:90, royalty:5, hot:false,
+    colors:["#2a0a2a","#1a0a3a","#2a1a2a","#0a1a2a"],
+    emojis:["👂","🎵","🎶","🎸","🎤","🎼","🎹","🥁"] },
+  { id:4, name:"Telon Prock", symbol:"TELONP", emoji:"🌑", creator:"0xCd4f", creatorAddr:"0xcd45...ef67", minted:156, price:157, royalty:4, hot:false,
+    colors:["#0a0a2a","#0a0a3a","#0a1a2a","#1a0a2a"],
+    emojis:["🌑","🌌","⭐","🚀","🪐","☄️","🌟","🛸"] },
+  { id:5, name:"Cyber Samurai", symbol:"CYBERSMR", emoji:"⚔️", creator:"0xEf5a", creatorAddr:"0xef56...gh78", minted:743, price:744, royalty:6, hot:true,
+    colors:["#0a1a2a","#2a0a0a","#0a2a2a","#1a1a0a"],
+    emojis:["⚔️","🥷","🔱","⚡","🌆","🎌","🏯","🗡️"] },
+  { id:6, name:"Pixel Punks", symbol:"PIXPUNK", emoji:"👾", creator:"0xA1b2", creatorAddr:"0xa1b2...c3d4", minted:28, price:29, royalty:3, hot:false,
+    colors:["#1a0a2a","#0a1a1a","#2a1a0a","#0a2a0a"],
+    emojis:["👾","🎮","🕹️","💾","📺","🎲","💻","🃏"] },
+];
+
+let walletConnected = false;
+let walletAddress = null;
+let isApproved = false;
+let activeCollection = null;
+let activeCreateTab = 'image';
+let activeStyle = 'none';
+let uploadedFile = null;
+let currentPage = 'home';
+let previousPage = 'home';
+let listings = []; // { collId, price, seller, nftId, emoji, color, collName }
+let mktVolume = 0;
+let mktSales = 0;
+let activeMarketFilter = 'all';
+let activeMarketSort = 'price-asc';
+
+const TICKER_DATA = [
+  { name:"Left Ear", action:"xxx burned #49", emoji:"👂" },
+  { name:"Left Ear", action:"xxx burned #30", emoji:"👂" },
+  { name:"Left Ear", action:"xxx burned #29", emoji:"👂" },
+  { name:"Traitor Pepe", action:"minted #488", emoji:"🐸" },
+  { name:"Cyber Samurai", action:"minted #744", emoji:"⚔️" },
+  { name:"Traitor Rocks", action:"burned #312", emoji:"🪨" },
+  { name:"Pixel Punks", action:"minted #29", emoji:"👾" },
+  { name:"Telon Prock", action:"minted #157", emoji:"🌑" },
+];
+
+const PROMPT_EXAMPLES = [
+  "A cyberpunk fox with neon green eyes and holographic armor",
+  "Cute baby dragon with fire breath, cartoon style",
+  "Mysterious hooded figure with glowing purple runes",
+  "Robot samurai in ancient Japan, cherry blossom",
+  "Abstract geometric skull with rainbow gradients",
+];
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  buildTicker();
+  renderGrid('homeGrid', COLLECTIONS);
+  renderGrid('browseGrid', COLLECTIONS);
+  seedDemoListings();
+  showPage('home');
+});
+
+function seedDemoListings() {
+  const demoSeeds = [
+    { collId:1, price:520, seller:'0x1a2b...3c4d', nftId:42, emoji:'🐸', color:'#1a2a1a', collName:'Traitor Pepe', collSymbol:'TRAITORPEP' },
+    { collId:1, price:499, seller:'0x9f8e...1234', nftId:77, emoji:'🔥', color:'#2a1a0a', collName:'Traitor Pepe', collSymbol:'TRAITORPEP' },
+    { collId:2, price:340, seller:'0xab12...cd34', nftId:18, emoji:'💎', color:'#2a2a2a', collName:'Traitor Rocks', collSymbol:'TRAITOROCK' },
+    { collId:5, price:800, seller:'0xef56...gh78', nftId:201, emoji:'⚔️', color:'#0a1a2a', collName:'Cyber Samurai', collSymbol:'CYBERSMR' },
+    { collId:5, price:755, seller:'0xcd45...ef67', nftId:99,  emoji:'🥷', color:'#2a0a0a', collName:'Cyber Samurai', collSymbol:'CYBERSMR' },
+    { collId:3, price:95,  seller:'0xa1b2...c3d4', nftId:5,   emoji:'🎵', color:'#2a0a2a', collName:'Left Ear',     collSymbol:'LEFTEAR' },
+  ];
+  listings.push(...demoSeeds);
+  mktSales = 12;
+  mktVolume = 4820;
+}
+
+// ============================================================
+// TICKER
+// ============================================================
+function buildTicker() {
+  const track = document.getElementById('tickerTrack');
+  const doubled = [...TICKER_DATA, ...TICKER_DATA, ...TICKER_DATA];
+  track.innerHTML = doubled.map(d => `
+    <div class="ticker-item">
+      <div class="ticker-avatar">${d.emoji}</div>
+      <div class="ticker-info">
+        <div class="ticker-name">${d.name}</div>
+        <div class="ticker-action">${d.action}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// GRID RENDER
+// ============================================================
+function renderGrid(containerId, data) {
+  const grid = document.getElementById(containerId);
+  if (!grid) return;
+  grid.innerHTML = data.map(c => {
+    const pct = (c.minted/1000*100).toFixed(1);
+    return `
+    <div class="coll-card" onclick="openCollection(${c.id})">
+      <div class="coll-cover">
+        <div class="coll-cover-placeholder">
+          ${c.emojis.slice(0,4).map((e,i) => `
+            <div class="coll-cover-cell" style="background:${c.colors[i]}">${e}</div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="coll-body">
+        <div class="coll-name">${c.name}</div>
+        <div class="coll-meta">
+          <div class="coll-creator">
+            <div class="creator-dot">${c.creator[0].toUpperCase()}</div>
+            ${c.creator}
+          </div>
+          <div>
+            <div class="coll-price">$${(c.price * 0.008).toFixed(2)}</div>
+            <div class="coll-symbol">${c.symbol.slice(0,8)}</div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterCollections(val) {
+  const filtered = COLLECTIONS.filter(c =>
+    c.name.toLowerCase().includes(val.toLowerCase()) ||
+    c.symbol.toLowerCase().includes(val.toLowerCase())
+  );
+  renderGrid('homeGrid', filtered);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(page) {
+  ['homePage','browsePage','createPage','detailPage','marketPage'].forEach(p => {
+    document.getElementById(p)?.classList.remove('active');
+  });
+  document.getElementById(page + 'Page')?.classList.add('active');
+  currentPage = page;
+  window.scrollTo(0,0);
+}
+
+function switchBnav(page) {
+  ['home','browse','market','create','profile'].forEach(p => {
+    document.getElementById('bnav-'+p)?.classList.remove('active');
+  });
+  document.getElementById('bnav-'+page)?.classList.add('active');
+
+  if (page === 'home') showPage('home');
+  else if (page === 'browse') showPage('browse');
+  else if (page === 'market') { showPage('market'); renderMarketPage(); }
+  else if (page === 'create') showPage('create');
+  else if (page === 'profile') {
+    if (!walletConnected) { connectWallet(); return; }
+    showToast('Profile coming soon!');
+  }
+}
+
+function goCreate() {
+  previousPage = currentPage;
+  showPage('create');
+  switchBnav('create');
+}
+
+function goBrowse() {
+  showPage('browse');
+  switchBnav('browse');
+}
+
+function goBack() {
+  showPage(previousPage === 'browse' ? 'browse' : 'home');
+}
+
+function openCollection(id) {
+  const c = COLLECTIONS.find(x => x.id === id);
+  if (!c) return;
+  activeCollection = c;
+  previousPage = currentPage;
+
+  // Populate detail page
+  document.getElementById('detailTitle').textContent = c.name;
+  document.getElementById('detailCollName').textContent = c.name;
+  document.getElementById('detailCreator').textContent = c.creatorAddr;
+  document.getElementById('detailCreatorDot').textContent = c.creator[0].toUpperCase();
+  document.getElementById('detailSymbol').textContent = c.symbol;
+  document.getElementById('detailHeroImg').textContent = c.emoji;
+  document.getElementById('detailMinted').textContent = c.minted.toLocaleString();
+  document.getElementById('detailRoyalty').textContent = c.royalty + '%';
+  updateDetailPricing(c.minted, c.price);
+
+  // NFT grid
+  const nftGrid = document.getElementById('detailNftGrid');
+  nftGrid.innerHTML = Array.from({length:32},(_,i) => {
+    const isMinted = i < c.minted;
+    const emoji = c.emojis[i % c.emojis.length];
+    return `<div class="nft-thumb ${isMinted?'minted':''}" style="background:${c.colors[i%4]}">
+      <span>${emoji}</span>
+      <span class="nft-num">#${i+1}</span>
+    </div>`;
+  }).join('');
+
+  // Button states
+  if (walletConnected) {
+    document.getElementById('approveBtn2').disabled = isApproved;
+    document.getElementById('mintBtn2').disabled = !isApproved || c.minted >= 1000;
+    document.getElementById('sellBtn').disabled = !isApproved || c.minted <= 0;
+  } else {
+    document.getElementById('approveBtn2').disabled = false;
+    document.getElementById('approveBtn2').textContent = 'Connect Wallet to Mint';
+    document.getElementById('mintBtn2').disabled = true;
+    document.getElementById('sellBtn').disabled = true;
+  }
+
+  // Reset market section visibility based on current state
+  checkMarketVisibility();
+
+  showPage('detail');
+}
+
+function updateDetailPricing(minted, price) {
+  const pct = (minted/1000*100).toFixed(1);
+  document.getElementById('detailPrice').textContent = price;
+  document.getElementById('detailNextPrice').textContent = `${price+1} $BANKR`;
+  document.getElementById('detailProgLabel').textContent = `${minted} / 1000 minted`;
+  document.getElementById('detailProgPct').textContent = pct + '%';
+  document.getElementById('detailProgFill').style.width = pct + '%';
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function setTab(tab) {
+  ['hot','new','top','feed','rank'].forEach(t => {
+    document.getElementById('tab-'+t)?.classList.remove('active');
+  });
+  document.getElementById('tab-'+tab)?.classList.add('active');
+
+  let filtered = [...COLLECTIONS];
+  if (tab === 'hot') filtered = COLLECTIONS.filter(c => c.hot);
+  else if (tab === 'new') filtered = [...COLLECTIONS].reverse().slice(0,4);
+  else if (tab === 'top') filtered = [...COLLECTIONS].sort((a,b) => b.minted - a.minted);
+  renderGrid('homeGrid', filtered);
+}
+
+// ============================================================
+// CREATE
+// ============================================================
+function switchCreateTab(tab) {
+  activeCreateTab = tab;
+  document.getElementById('ctab-create').classList.toggle('active', tab==='create');
+  document.getElementById('ctab-image').classList.toggle('active', tab==='image');
+  document.getElementById('createImagePanel').style.display = tab==='image' ? 'block' : 'none';
+  document.getElementById('createPromptPanel').style.display = tab==='create' ? 'block' : 'none';
+}
+
+function handleImageUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  uploadedFile = file;
+  const zone = document.getElementById('uploadZone');
+  const reader = new FileReader();
+  reader.onload = e => {
+    zone.classList.add('has-file');
+    zone.innerHTML = `<img class="upload-preview" src="${e.target.result}">
+      <div class="upload-text">${file.name}</div>
+      <div class="upload-sub">${(file.size/1024).toFixed(1)}KB · Tap to change</div>`;
+    zone.onclick = () => document.getElementById('imageInput').click();
+  };
+  reader.readAsDataURL(file);
+}
+
+function selectStyle(el, style) {
+  document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  activeStyle = style;
+}
+
+function randomPrompt() {
+  const p = PROMPT_EXAMPLES[Math.floor(Math.random()*PROMPT_EXAMPLES.length)];
+  document.getElementById('promptInput').value = p;
+}
+
+async function makeCollection() {
+  if (!walletConnected) {
+    await connectWallet();
+    if (!walletConnected) return;
+  }
+
+  const name = document.getElementById('collNameInput').value.trim() ||
+    (activeCreateTab === 'image' ? 'My Collection' : (document.getElementById('promptInput').value.trim().slice(0,20) || 'My Collection'));
+
+  if (activeCreateTab === 'image' && !uploadedFile && activeCreateTab === 'image') {
+    // Allow even without image
+  }
+
+  const makeBtn = document.getElementById('makeBtn');
+  makeBtn.disabled = true;
+  const txRow = document.getElementById('createTxRow');
+  txRow.classList.add('show');
+  document.getElementById('createTxText').textContent = 'Approving 60 $BANKR…';
+
+  await sleep(1500);
+  document.getElementById('createTxText').textContent = 'Deploying collection…';
+  await sleep(1500);
+  txRow.classList.remove('show');
+
+  // Start generation
+  showGeneration(name);
+}
+
+async function showGeneration(name) {
+  const overlay = document.getElementById('genOverlay');
+  overlay.classList.add('show');
+  const bar = document.getElementById('genBar');
+  const count = document.getElementById('genCount');
+  const cells = document.querySelectorAll('.gen-preview-cell');
+  const emojis = ['🦊','🐺','🐱','🦁','🐸','🐉','🦄','🐼','👾','⚔️','🔮','💎','🌟','🎭','🏯','🚀'];
+
+  let shown = 0;
+  for (let i=0; i<=1000; i += Math.floor(Math.random()*18)+8) {
+    const pct = Math.min(i/1000*100, 100);
+    bar.style.width = pct + '%';
+    count.textContent = `${Math.min(i,1000)} / 1000`;
+
+    if (shown < 8) {
+      cells[shown].textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      cells[shown].classList.add('shown');
+      shown++;
+    } else {
+      const idx = Math.floor(Math.random()*8);
+      cells[idx].textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    }
+
+    await sleep(100);
+    if (i >= 1000) break;
+  }
+  bar.style.width = '100%';
+  count.textContent = '1000 / 1000';
+  await sleep(600);
+  overlay.classList.remove('show');
+
+  // Add new collection
+  const newColl = {
+    id: COLLECTIONS.length + 1,
+    name: name.toUpperCase() || 'MY COLLECTION',
+    symbol: name.slice(0,8).toUpperCase().replace(/\s/g,''),
+    emoji: '✨',
+    creator: walletAddress ? walletAddress.slice(2,8) : 'you',
+    creatorAddr: walletAddress || '0x...',
+    minted: 0, price: 1, royalty: 5, hot: false,
+    colors: ['#1a1a2a','#2a1a1a','#1a2a1a','#2a2a1a'],
+    emojis: ['✨','🌟','💫','⭐','🔮','💎','🎭','🌈'],
+  };
+  COLLECTIONS.unshift(newColl);
+  renderGrid('homeGrid', COLLECTIONS);
+  renderGrid('browseGrid', COLLECTIONS);
+
+  showToast('Collection created! 🎉');
+  document.getElementById('makeBtn').disabled = false;
+  document.getElementById('collNameInput').value = '';
+  document.getElementById('promptInput').value = '';
+  document.getElementById('uploadZone').classList.remove('has-file');
+  document.getElementById('uploadZone').innerHTML = `
+    <div class="upload-icon-big">🖼️</div>
+    <div class="upload-text">Tap to upload an image</div>
+    <div class="upload-sub">PNG, JPG, GIF · Your character</div>
+  `;
+  document.getElementById('uploadZone').onclick = () => document.getElementById('imageInput').click();
+  uploadedFile = null;
+
+  // Switch to browse after creation
+  await sleep(500);
+  showPage('home');
+  switchBnav('home');
+}
+
+// ============================================================
+// WALLET
+// ============================================================
+async function connectWallet() {
+  if (walletConnected) return;
+  if (window.ethereum) {
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      walletAddress = accounts[0];
+      walletConnected = true;
+      const btn = document.getElementById('walletBtn');
+      btn.textContent = walletAddress.slice(0,6)+'...'+walletAddress.slice(-4);
+      btn.classList.add('connected');
+      document.getElementById('approveBtn2').disabled = false;
+      showToast('Wallet connected ✓');
+    } catch(e) {
+      showToast('Connection failed');
+    }
+  } else {
+    // Demo mode
+    walletAddress = '0x' + Math.random().toString(16).slice(2,12);
+    walletConnected = true;
+    const btn = document.getElementById('walletBtn');
+    btn.textContent = walletAddress.slice(0,6)+'...'+walletAddress.slice(-4);
+    btn.classList.add('connected');
+    document.getElementById('approveBtn2').disabled = false;
+    showToast('Demo wallet connected ✓');
+  }
+}
+
+// ============================================================
+// APPROVE + MINT
+// ============================================================
+async function approveToken() {
+  if (!walletConnected) { await connectWallet(); return; }
+  document.getElementById('approveBtn2').disabled = true;
+  document.getElementById('mintTxRow').classList.add('show');
+  document.getElementById('mintTxText').textContent = 'Approving $BANKR…';
+  await sleep(2000);
+  document.getElementById('mintTxRow').classList.remove('show');
+  isApproved = true;
+  if (activeCollection && activeCollection.minted < 1000) {
+    document.getElementById('mintBtn2').disabled = false;
+  }
+  if (activeCollection && activeCollection.minted > 0) {
+    document.getElementById('sellBtn').disabled = false;
+  }
+  showToast('$BANKR approved ✓');
+}
+
+async function doMint() {
+  if (!walletConnected || !isApproved || !activeCollection) return;
+
+  const mintBtn = document.getElementById('mintBtn2');
+  const txRow   = document.getElementById('mintTxRow');
+  const txText  = document.getElementById('mintTxText');
+
+  mintBtn.disabled = true;
+
+  // ── Phase 1: Simulated on-chain tx ──────────────────────────
+  txRow.classList.add('show');
+  txText.textContent = `Minting NFT #${activeCollection.minted + 1}…`;
+  await sleep(2200);
+  txRow.classList.remove('show');
+
+  const pricePaid = activeCollection.price;
+  const mintedId  = activeCollection.minted + 1;
+  activeCollection.minted++;
+  activeCollection.price++;
+
+  const idx = COLLECTIONS.findIndex(c => c.id === activeCollection.id);
+  if (idx >= 0) {
+    COLLECTIONS[idx].minted = activeCollection.minted;
+    COLLECTIONS[idx].price  = activeCollection.price;
+  }
+
+  updateDetailPricing(activeCollection.minted, activeCollection.price);
+  renderGrid('homeGrid', COLLECTIONS);
+  renderGrid('browseGrid', COLLECTIONS);
+
+  // Mark thumb as minted with loading spinner while AI generates
+  const thumbs = document.querySelectorAll('#detailNftGrid .nft-thumb');
+  const thumb  = thumbs[mintedId - 1];
+  if (thumb) {
+    thumb.classList.add('minted');
+    thumb.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:4px">
+        <div class="spin" style="border-top-color:#fff;border-color:rgba(255,255,255,0.3)"></div>
+        <span style="font-size:8px;color:rgba(255,255,255,0.7);font-weight:700">AI...</span>
+      </div>
+      <span class="nft-num">#${mintedId}</span>
+    `;
+  }
+
+  document.getElementById('sellBtn').disabled = false;
+  checkMarketVisibility();
+  if (activeCollection.minted < 1000) mintBtn.disabled = false;
+
+  // ── Phase 2: AI Image Generation ────────────────────────────
+  txRow.classList.add('show');
+  txText.textContent = '🎨 AI generating your NFT…';
+
+  let imageUrl = null;
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        collectionName: activeCollection.name,
+        style: activeCollection.activeStyle || activeStyle || 'digital art',
+        nftId: mintedId,
+        prompt: activeCollection.name,
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      imageUrl = data.imageUrl;
+    }
+  } catch (e) {
+    console.warn('AI generation error (fallback to emoji):', e);
+  }
+
+  txRow.classList.remove('show');
+
+  // Update thumb with real image or fallback emoji
+  if (thumb) {
+    if (imageUrl) {
+      thumb.innerHTML = `
+        <img src="${imageUrl}"
+          style="width:100%;height:100%;object-fit:cover;border-radius:12px"
+          onerror="this.parentElement.innerHTML='<span>${activeCollection.emojis[mintedId % activeCollection.emojis.length]}</span><span class=nft-num>#${mintedId}</span>'"
+        >
+        <span class="nft-num">#${mintedId}</span>
+      `;
+    } else {
+      // Fallback: emoji
+      thumb.innerHTML = `
+        <span>${activeCollection.emojis[mintedId % activeCollection.emojis.length]}</span>
+        <span class="nft-num">#${mintedId}</span>
+      `;
+    }
+  }
+
+  // ── Phase 3: Success modal ───────────────────────────────────
+  document.getElementById('modalTitle').textContent = 'Minted! 🎉';
+  document.getElementById('modalDesc').textContent =
+    `You got NFT #${mintedId} from "${activeCollection.name}" for ${pricePaid} $BANKR.` +
+    (imageUrl ? ' Your unique AI image is on IPFS!' : '') +
+    ` Next buyer pays ${activeCollection.price} $BANKR!`;
+  document.getElementById('modalTag').textContent = `NFT #${mintedId} · ${pricePaid} $BANKR`;
+
+  if (imageUrl) {
+    document.getElementById('modalEmoji').textContent = '';
+    document.getElementById('modalEmoji').innerHTML =
+      `<img src="${imageUrl}" style="width:80px;height:80px;border-radius:16px;object-fit:cover">`;
+  }
+
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('show');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+// ============================================================
+// SELL (BURN) — PRIMARY EXIT, 30% TAX
+// ============================================================
+function doSell() {
+  if (!walletConnected || !isApproved || !activeCollection) return;
+  if (activeCollection.minted <= 0) {
+    showToast('Nothing to sell — no NFTs minted yet');
+    return;
+  }
+
+  const currentPrice = activeCollection.price - 1;
+  const payout = (currentPrice * 0.7).toFixed(2);
+
+  // Update bonding curve state
+  activeCollection.minted = Math.max(0, activeCollection.minted - 1);
+  activeCollection.price = Math.max(1, activeCollection.price - 1);
+
+  // Sync into COLLECTIONS array
+  const idx = COLLECTIONS.findIndex(c => c.id === activeCollection.id);
+  if (idx >= 0) {
+    COLLECTIONS[idx].minted = activeCollection.minted;
+    COLLECTIONS[idx].price = activeCollection.price;
+  }
+
+  // Flash animation on sell button
+  const sellBtn = document.getElementById('sellBtn');
+  sellBtn.classList.add('flashing');
+  setTimeout(() => sellBtn.classList.remove('flashing'), 600);
+
+  // Update all UI
+  updateDetailPricing(activeCollection.minted, activeCollection.price);
+  renderGrid('homeGrid', COLLECTIONS);
+  renderGrid('browseGrid', COLLECTIONS);
+
+  // Unmark last minted thumb
+  const thumbs = document.querySelectorAll('#detailNftGrid .nft-thumb');
+  let lastMinted = -1;
+  thumbs.forEach((t, i) => { if (t.classList.contains('minted')) lastMinted = i; });
+  if (lastMinted >= 0) thumbs[lastMinted].classList.remove('minted');
+
+  // Check sold-out state to toggle market
+  checkMarketVisibility();
+
+  showToast(`🔥 Sold for ${payout} $BANKR (-30% tax)`);
+}
+
+// ============================================================
+// SECONDARY MARKET — only after minted == 1000
+// ============================================================
+function checkMarketVisibility() {
+  const ms = document.getElementById('marketSection');
+  if (!activeCollection) return;
+  if (activeCollection.minted >= 1000) {
+    ms.style.display = 'block';
+    document.getElementById('mintBtn2').disabled = true;
+    renderListings();
+  } else {
+    ms.style.display = 'none';
+  }
+}
+
+function renderListings() {
+  const container = document.getElementById('listingsContainer');
+  if (!container || !activeCollection) return;
+  const collListings = listings.filter(l => l.collId === activeCollection.id);
+  if (collListings.length === 0) {
+    container.innerHTML = '<div class="market-empty">No listings yet. Be the first to list!</div>';
+    return;
+  }
+  container.innerHTML = collListings.map(item => {
+    const globalIdx = listings.indexOf(item);
+    return `
+      <div class="listing-card">
+        <div class="listing-left">
+          <div>
+            <span class="listing-price">${item.price}</span>
+            <span class="listing-price-token">$BANKR</span>
+          </div>
+          <div class="listing-seller">${item.collName} #${item.nftId} · by ${item.seller}</div>
+        </div>
+        <button class="buy-from-market-btn" onclick="buyFromMarket(${globalIdx})">Buy</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function listNFT() {
+  if (!walletConnected) { showToast('Connect wallet first'); return; }
+  const input = prompt('Set your listing price (in $BANKR):');
+  if (!input) return;
+  const price = parseFloat(input);
+  if (isNaN(price) || price <= 0) { showToast('Invalid price'); return; }
+
+  const seller = walletAddress ? (walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4)) : '0x???';
+  const nftId = Math.floor(Math.random() * activeCollection.minted) + 1;
+  const emoji = activeCollection.emojis[nftId % activeCollection.emojis.length];
+  const color = activeCollection.colors[nftId % 4];
+
+  listings.push({
+    collId: activeCollection.id,
+    collName: activeCollection.name,
+    collSymbol: activeCollection.symbol,
+    price,
+    seller,
+    nftId,
+    emoji,
+    color
+  });
+
+  renderListings();
+  renderMarketPage();
+  showToast(`Listed NFT #${nftId} for ${price} $BANKR ✓`);
+}
+
+function buyFromMarket(index) {
+  if (!walletConnected) { showToast('Connect wallet first'); return; }
+  const item = listings[index];
+  if (!item) return;
+  const fee = (item.price * 0.02).toFixed(2);
+
+  mktVolume += item.price;
+  mktSales += 1;
+  listings.splice(index, 1);
+
+  renderListings();
+  renderMarketPage();
+  showToast(`🎉 Bought NFT #${item.nftId} for ${item.price} $BANKR (fee: ${fee})`);
+}
+
+// ============================================================
+// GLOBAL MARKETPLACE PAGE
+// ============================================================
+function renderMarketPage() {
+  const grid = document.getElementById('marketNftGrid');
+  if (!grid) return;
+
+  // Update stats
+  document.getElementById('mktStatVol').textContent = mktVolume > 0 ? mktVolume.toFixed(0) : '0';
+  document.getElementById('mktStatSales').textContent = mktSales;
+
+  // Build filter chips
+  buildMarketFilters();
+
+  // Filter
+  let filtered = [...listings];
+  if (activeMarketFilter !== 'all') {
+    filtered = filtered.filter(l => String(l.collId) === String(activeMarketFilter));
+  }
+
+  // Sort
+  if (activeMarketSort === 'price-asc') filtered.sort((a,b) => a.price - b.price);
+  else if (activeMarketSort === 'price-desc') filtered.sort((a,b) => b.price - a.price);
+  // 'recent' = natural insertion order (default)
+
+  // Floor price
+  const floor = filtered.length > 0 ? Math.min(...filtered.map(l => l.price)) : null;
+  document.getElementById('mktStatFloor').textContent = floor !== null ? floor : '—';
+
+  // Listing count
+  document.getElementById('marketListingCount').textContent =
+    filtered.length === 1 ? '1 listing' : `${filtered.length} listings`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div class="market-empty-state">
+        <div class="market-empty-icon">🏪</div>
+        <div class="market-empty-title">No NFTs listed yet</div>
+        <div class="market-empty-sub">List your NFTs from a collection page<br>to start trading here.</div>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(item => {
+    const globalIdx = listings.indexOf(item);
+    return `
+      <div class="market-nft-card" onclick="void(0)">
+        <div class="market-nft-img" style="background:${item.color}">
+          <span>${item.emoji}</span>
+          <div class="market-nft-id-badge">#${item.nftId}</div>
+        </div>
+        <div class="market-nft-body">
+          <div class="market-nft-coll">${item.collSymbol || item.collName}</div>
+          <div class="market-nft-name">${item.collName} #${item.nftId}</div>
+          <div class="market-nft-price-row">
+            <div class="market-nft-price-block">
+              <div class="market-nft-buy-label">Buy now</div>
+              <div>
+                <span class="market-nft-price">${item.price}</span>
+                <span class="market-nft-price-token">$BANKR</span>
+              </div>
+            </div>
+            <button class="market-nft-buy-btn" onclick="event.stopPropagation();buyFromMarket(${globalIdx})">Buy</button>
+          </div>
+          <div class="market-nft-seller">Listed by ${item.seller}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function buildMarketFilters() {
+  const row = document.getElementById('marketFilterRow');
+  if (!row) return;
+  const collIds = [...new Set(listings.map(l => l.collId))];
+  const chips = [`<div class="market-filter-chip ${activeMarketFilter==='all'?'active':''}" onclick="filterMarket('all',this)">All</div>`];
+  collIds.forEach(id => {
+    const coll = COLLECTIONS.find(c => c.id === id);
+    if (!coll) return;
+    const active = String(activeMarketFilter) === String(id) ? 'active' : '';
+    chips.push(`<div class="market-filter-chip ${active}" onclick="filterMarket(${id},this)">${coll.emoji} ${coll.name}</div>`);
+  });
+  row.innerHTML = chips.join('');
+}
+
+function filterMarket(collId, el) {
+  activeMarketFilter = collId;
+  renderMarketPage();
+}
+
+function sortMarket(val) {
+  activeMarketSort = val;
+  renderMarketPage();
+}
+</script>
+</body>
+</html>

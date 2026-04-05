@@ -1,5 +1,40 @@
-export default async function handler(req, res) {
-  // CORS headers
+const https = require('https');
+
+function fetchJson(url, options, body) {
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const reqOptions = {
+      hostname: urlObj.hostname,
+      path: urlObj.pathname + urlObj.search,
+      method: options.method || 'GET',
+      headers: options.headers || {},
+    };
+    const req = https.request(reqOptions, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try { resolve({ ok: res.statusCode < 300, status: res.statusCode, data: JSON.parse(data) }); }
+        catch { resolve({ ok: res.statusCode < 300, status: res.statusCode, data }); }
+      });
+    });
+    req.on('error', reject);
+    if (body) req.write(JSON.stringify(body));
+    req.end();
+  });
+}
+
+function fetchBuffer(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      const chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
+      res.on('end', () => resolve(Buffer.concat(chunks)));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -7,150 +42,70 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { prompt, style, collectionName, nftId } = req.body;
+  const { prompt, style, collectionName, nftId } = req.body || {};
+  const FAL_API_KEY = process.env.FAL_API_KEY;
+  const PINATA_JWT  = process.env.PINATA_JWT;
 
-  if (!prompt && !collectionName) {
-    return res.status(400).json({ error: 'prompt or collectionName required' });
-  }
+  if (!FAL_API_KEY) return res.status(500).json({ error: 'FAL_API_KEY not set' });
+  if (!PINATA_JWT)  return res.status(500).json({ error: 'PINATA_JWT not set' });
 
   try {
-    // ================================================
-    // STEP 1: Generate image via fal.ai (FLUX Schnell)
-    // ================================================
-    const fullPrompt = [
-      collectionName || prompt,
-      style ? `${style} style` : 'digital art style',
-      'NFT profile picture, detailed, vibrant colors, high quality, trending on opensea'
-    ].join(', ');
+    const fullPrompt = `${collectionName || prompt || 'NFT art'}, ${style || 'digital art'} style, NFT profile picture, vibrant colors, high quality`;
 
-    const falRes = await fetch('https://fal.run/fal-ai/flux/schnell', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Key ${process.env.FAL_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        prompt: fullPrompt,
-        image_size: 'square_hd',
-        num_inference_steps: 4,
-        num_images: 1,
-        enable_safety_checker: true,
-      })
-    });
-
-    if (!falRes.ok) {
-      const err = await falRes.text();
-      console.error('fal.ai error:', err);
-      return res.status(500).json({ error: 'Image generation failed', detail: err });
-    }
-
-    const falData = await falRes.json();
-    const imageUrl = falData.images?.[0]?.url;
-
-    if (!imageUrl) {
-      return res.status(500).json({ error: 'No image returned from fal.ai' });
-    }
-
-    // ================================================
-    // STEP 2: Download image buffer
-    // ================================================
-    const imageRes = await fetch(imageUrl);
-    if (!imageRes.ok) {
-      return res.status(500).json({ error: 'Failed to download generated image' });
-    }
-    const imageBuffer = await imageRes.arrayBuffer();
-
-    // ================================================
-    // STEP 3: Upload image to Pinata (IPFS)
-    // ================================================
-    const fileName = `${(collectionName || 'nft').replace(/\s+/g, '-').toLowerCase()}-${nftId || Date.now()}.png`;
-
-    const formData = new FormData();
-    formData.append(
-      'file',
-      new Blob([imageBuffer], { type: 'image/png' }),
-      fileName
+    const falResult = await fetchJson(
+      'https://fal.run/fal-ai/flux/schnell',
+      { method: 'POST', headers: { 'Authorization': `Key ${FAL_API_KEY}`, 'Content-Type': 'application/json' } },
+      { prompt: fullPrompt, image_size: 'square_hd', num_inference_steps: 4, num_images: 1 }
     );
-    formData.append('pinataMetadata', JSON.stringify({
-      name: fileName,
-      keyvalues: {
-        collection: collectionName || 'unknown',
-        nftId: String(nftId || ''),
-      }
-    }));
-    formData.append('pinataOptions', JSON.stringify({ cidVersion: 1 }));
 
-    const pinataRes = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.PINATA_JWT}`,
-      },
-      body: formData
-    });
+    if (!falResult.ok) {
+      console.error('fal error:', falResult.data);
+      return res.status(500).json({ error: 'fal.ai failed', detail: falResult.data });
+    }
 
-    if (!pinataRes.ok) {
-      const err = await pinataRes.text();
-      console.error('Pinata error:', err);
-      // Fallback: return fal.ai URL directly if Pinata fails
-      return res.status(200).json({
-        imageUrl,
-        ipfsUrl: null,
-        source: 'fal-direct',
-        nftId,
+    const imageUrl = falResult.data?.images?.[0]?.url;
+    if (!imageUrl) return res.status(500).json({ error: 'No image from fal.ai' });
+
+    const imageBuffer = await fetchBuffer(imageUrl);
+
+    const boundary = '----Boundary' + Date.now();
+    const fileName  = `${(collectionName||'nft').replace(/\s+/g,'-')}-${nftId||Date.now()}.png`;
+    const formBody  = Buffer.concat([
+      Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${fileName}"\r\nContent-Type: image/png\r\n\r\n`),
+      imageBuffer,
+      Buffer.from(`\r\n--${boundary}--\r\n`)
+    ]);
+
+    const pinataResult = await new Promise((resolve, reject) => {
+      const req = https.request({
+        hostname: 'api.pinata.cloud',
+        path: '/pinning/pinFileToIPFS',
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${PINATA_JWT}`,
+          'Content-Type': `multipart/form-data; boundary=${boundary}`,
+          'Content-Length': formBody.length,
+        },
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => resolve({ ok: res.statusCode < 300, data: JSON.parse(data) }));
       });
-    }
-
-    const pinataData = await pinataRes.json();
-    const ipfsHash = pinataData.IpfsHash;
-    const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
-
-    // ================================================
-    // STEP 4: Upload metadata JSON to Pinata
-    // ================================================
-    const metadata = {
-      name: `${collectionName} #${nftId}`,
-      description: `NFT #${nftId} from the ${collectionName} collection on BANKRMINT`,
-      image: ipfsUrl,
-      attributes: [
-        { trait_type: 'Collection', value: collectionName },
-        { trait_type: 'Style', value: style || 'Digital Art' },
-        { trait_type: 'Token ID', value: nftId },
-      ]
-    };
-
-    const metaFormData = new FormData();
-    metaFormData.append(
-      'file',
-      new Blob([JSON.stringify(metadata, null, 2)], { type: 'application/json' }),
-      `${fileName.replace('.png', '')}-metadata.json`
-    );
-    metaFormData.append('pinataMetadata', JSON.stringify({ name: `${fileName}-metadata` }));
-
-    const metaRes = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${process.env.PINATA_JWT}` },
-      body: metaFormData
+      req.on('error', reject);
+      req.write(formBody);
+      req.end();
     });
 
-    let metadataUrl = null;
-    if (metaRes.ok) {
-      const metaData = await metaRes.json();
-      metadataUrl = `https://gateway.pinata.cloud/ipfs/${metaData.IpfsHash}`;
+    if (!pinataResult.ok) {
+      console.error('Pinata error:', pinataResult.data);
+      return res.status(200).json({ imageUrl, source: 'fal-direct', nftId });
     }
 
-    // ================================================
-    // DONE — return everything
-    // ================================================
-    return res.status(200).json({
-      imageUrl: ipfsUrl,
-      metadataUrl,
-      ipfsHash,
-      nftId,
-      source: 'ipfs',
-    });
+    const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${pinataResult.data.IpfsHash}`;
+    return res.status(200).json({ imageUrl: ipfsUrl, nftId, source: 'ipfs' });
 
   } catch (err) {
-    console.error('generate handler error:', err);
-    return res.status(500).json({ error: 'Internal server error', detail: err.message });
+    console.error('error:', err);
+    return res.status(500).json({ error: err.message });
   }
-}
+};
